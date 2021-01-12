@@ -1,5 +1,4 @@
 import {useState, useEffect} from "react";
-import 'antd/dist/antd.css';
 import {supabase} from './utils/initSupabase';
 import {Layout, Button, Tooltip, Typography} from 'antd';
 import {LogoutOutlined} from "@ant-design/icons";
@@ -8,9 +7,9 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
-
-import AuthComponent from "./components/Auth";
+import 'antd/dist/antd.css';
 import './App.css';
+import AuthComponent from "./components/Auth";
 import FormSolve from "./pages/FormSolve";
 import Home from "./pages/Home";
 

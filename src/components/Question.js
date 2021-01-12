@@ -1,32 +1,28 @@
-import {useMemo, useState} from "react"
+import {useState} from "react"
 import {Card, Radio} from 'antd';
-import {Chart} from 'react-charts';
+import {
+    BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip,
+} from 'recharts';
 
 const Question = ({number, setAnswer, lastVote = null, a = 0, b = 0, c = 0, d = 0}) => {
     const [selected, setSelected] = useState(lastVote);
     const plainOptions = ["A", "B", "C", "D"]
-    const chartData = useMemo(() => [
-            {
-                label: 'Votes',
-                data: [['A', a], ['B', b], ['C', c], ['D', d]]
-            },
-        ], [a, b, c, d]
-    )
+    const chartData = [
+        {
+            name: 'A', votes: a,
+        },
+        {
+            name: 'B', votes: b,
+        },
+        {
+            name: 'C', votes: c,
+        },
+        {
+            name: 'D', votes: d,
+        },
 
-    const series = useMemo(
-        () => ({
-            type: 'bar'
-        }),
-        []
-    )
+    ];
 
-    const axes = useMemo(
-        () => [
-            {primary: true, type: 'ordinal', position: 'bottom'},
-            {position: 'left', type: 'linear', stacked: false, secondary: true}
-        ],
-        []
-    )
 
     const onRadioChange = ({target: {value}}) => {
         setAnswer(number, value, value.toLowerCase() + "_votes", selected ? selected.toLowerCase() + "_votes" : null, Boolean(selected))
@@ -36,9 +32,20 @@ const Question = ({number, setAnswer, lastVote = null, a = 0, b = 0, c = 0, d = 
     return (
         <Card title={"Question " + (number + 1)} style={{width: 300, margin: "12px 0"}}>
             <p>Total Votes: {a + b + c + d}</p>
-            <div style={{height: 200}}>
-                <Chart data={chartData} series={series} axes={axes} tooltip/>
-            </div>
+            <ResponsiveContainer width={"100%"} height={200}>
+                <BarChart
+                    data={chartData}
+                    barCategoryGap={"20%"}
+                    margin={{
+                        top: 0, right: 0, left: 0, bottom: 0,
+                    }}
+                >
+                    <XAxis dataKey="name"/>
+                    <YAxis allowDecimals={false}/>
+                    <Tooltip/>
+                    <Bar dataKey="votes" fill="#001529"/>
+                </BarChart>
+            </ResponsiveContainer>
             <Radio.Group options={plainOptions} onChange={onRadioChange} value={selected} style={{marginLeft: 36}}/>
         </Card>
     )
