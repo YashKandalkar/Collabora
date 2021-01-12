@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 
-import {Typography, Spin, Divider} from "antd";
+import {Typography, Spin, Divider, Alert} from "antd";
 import Question from "../components/Question";
 
 const {Title, Paragraph} = Typography;
@@ -127,6 +127,11 @@ const FormSolve = ({supabase}) => {
         <div style={{display: "flex", flexDirection: "column"}}>
             <Title>{formData ? formData.name : (formError ? "Error fetching form" : "Fetching form...")}</Title>
             {formData && <Paragraph>{formData.description}</Paragraph>}
+            <Alert
+                message="If you are not able to see the secondary axis properly, just reload the page."
+                type="info"
+                showIcon
+            />
             <Divider/>
             {formData
                 ? (
