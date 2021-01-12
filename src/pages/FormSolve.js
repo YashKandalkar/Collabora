@@ -4,7 +4,7 @@ import {useParams} from "react-router-dom";
 import {Typography, Spin, Divider} from "antd";
 import Question from "../components/Question";
 
-const {Title, Paragraph, Text} = Typography;
+const {Title, Paragraph} = Typography;
 
 const FormSolve = ({supabase}) => {
     const {id} = useParams();
@@ -39,12 +39,12 @@ const FormSolve = ({supabase}) => {
                         .from('questions')
                         .select()
                         .eq('form_id', data[0].id)
-                    const mySubscription = supabase
+                    supabase
                         .from('questions')
                         .on('UPDATE', payload => {
                             setQuestionsData(state => {
                                 if (state) {
-                                    let newQues = {...questionsData};
+                                    let newQues = {...state};
                                     newQues[payload.new.question_number] = payload.new;
                                     return {...state, ...newQues};
                                 } else {
@@ -81,7 +81,7 @@ const FormSolve = ({supabase}) => {
         return () => {
             mounted = false
         };
-    }, []);
+    }, [id, supabase]);
 
     const onAnswerSet = async (qNum, ans, curr_col_name, last_col_name, last_opt_val) => {
         const user = supabase.auth.user();
