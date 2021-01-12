@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import 'antd/dist/antd.css';
 import {supabase} from './utils/initSupabase';
 import {Layout, Button, Tooltip, Typography} from 'antd';
@@ -19,6 +19,19 @@ const {Link} = Typography;
 
 function App() {
     const [login, setLogin] = useState(false);
+
+    useEffect(() => {
+        let mounted = true;
+        if (mounted) {
+            const token = JSON.parse(localStorage.getItem("supabase.auth.token"));
+            if (token) {
+                let expiresAt = Number(token.expiresAt);
+                if (Date.now() < (expiresAt * 1000)) {
+                    setLogin(true);
+                }
+            }
+        }
+    }, [])
     const onLogoutClick = async () => {
         await supabase.auth.signOut();
         setLogin(false);
