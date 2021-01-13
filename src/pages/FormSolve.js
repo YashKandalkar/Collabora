@@ -6,7 +6,7 @@ import Question from "../components/Question";
 
 const {Title, Paragraph} = Typography;
 
-const FormSolve = ({supabase}) => {
+const FormSolve = ({supabase, user}) => {
     const {id} = useParams();
     const [formData, setFormData] = useState(null)
     const [formError, setFormError] = useState(null)
@@ -15,6 +15,7 @@ const FormSolve = ({supabase}) => {
 
     useEffect(() => {
         let mounted = true;
+        let questionsSubscription;
 
         async function getForm(setFormData, setFormError) {
             const arrToObj = (arr) => {
@@ -39,7 +40,7 @@ const FormSolve = ({supabase}) => {
                         .from('questions')
                         .select()
                         .eq('form_id', data[0].id)
-                    supabase
+                    questionsSubscription = supabase
                         .from('questions')
                         .on('UPDATE', payload => {
                             setQuestionsData(state => {
@@ -53,7 +54,6 @@ const FormSolve = ({supabase}) => {
                             });
                         })
                         .subscribe()
-                    const user = supabase.auth.user();
                     const votes = await supabase
                         .from('votes')
                         .select("option, question_id, question_number")
@@ -79,12 +79,12 @@ const FormSolve = ({supabase}) => {
         getForm(setFormData, setFormError).catch(console.log);
 
         return () => {
-            mounted = false
+            mounted = false;
+            questionsSubscription.unsubscribe();
         };
-    }, [id, supabase]);
+    }, [id, supabase, user.id]);
 
     const onAnswerSet = async (qNum, ans, curr_col_name, last_col_name, last_opt_val) => {
-        const user = supabase.auth.user();
         const {data, error} = await supabase
             .from("questions")
             .select()

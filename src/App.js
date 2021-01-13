@@ -18,23 +18,40 @@ const {Link} = Typography;
 
 function App() {
     const [login, setLogin] = useState(false);
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         let mounted = true;
+        let authListener;
         if (mounted) {
-            const token = JSON.parse(localStorage.getItem("supabase.auth.token"));
-            if (token) {
-                let expiresAt = Number(token.expiresAt);
-                if (Date.now() < (expiresAt * 1000)) {
-                    setLogin(true);
+            const session = supabase.auth.session();
+            setUser(session?.user ?? null);
+
+            const {data} = supabase.auth.onAuthStateChange(
+                async (event, session) => {
+                    const currentUser = session?.user;
+                    setUser(currentUser ?? null);
+                    if (currentUser) {
+                        setLogin(true);
+                    }
                 }
+            )
+            authListener = data;
+            if (user) {
+                setLogin(true);
             }
         }
-    }, [])
+        return () => {
+            mounted = false;
+            authListener.unsubscribe()
+        }
+    }, [user])
+
     const onLogoutClick = async () => {
         await supabase.auth.signOut();
         setLogin(false);
     }
+
     return (
         <Router>
             <Layout className="layout" style={{minHeight: "100vh"}}>
@@ -57,11 +74,12 @@ function App() {
                     <div className="site-layout-content" style={{justifyContent: "center", display: "flex"}}>
                         <Switch>
                             <Route path="/form:id">
-                                {login ? <FormSolve supabase={supabase}/> :
-                                    <AuthComponent setLogin={setLogin} supabase={supabase}/>}
+                                {login ? <FormSolve user={user} supabase={supabase}/> :
+                                    <AuthComponent setLogin={setLogin} setUser={setUser} supabase={supabase}/>}
                             </Route>
                             <Route path="/">
-                                {login ? <Home/> : <AuthComponent setLogin={setLogin} supabase={supabase}/>}
+                                {login ? <Home user={user}/> :
+                                    <AuthComponent setLogin={setLogin} setUser={setUser} supabase={supabase}/>}
                             </Route>
                         </Switch>
                     </div>

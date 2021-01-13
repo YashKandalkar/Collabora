@@ -3,7 +3,7 @@ import {useState} from "react";
 import {Form, Input, Button, Alert} from 'antd';
 
 
-const AuthComponent = ({setLogin, supabase}) => {
+const AuthComponent = ({setLogin, supabase, setUser}) => {
     const [register, setRegister] = useState(false);
     const [loading, setLoading] = useState(false);
     const [promptText, setPromptText] = useState({type: '', message: ''});
@@ -26,6 +26,7 @@ const AuthComponent = ({setLogin, supabase}) => {
             setPromptText({type: "success", message: "An email has been sent to you for verification!"});
             setLogin(false);
         } else if (!error && user) {
+            setUser(user);
             setLogin(true);
         }
         if (error) {
