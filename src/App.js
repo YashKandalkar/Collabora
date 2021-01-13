@@ -43,7 +43,7 @@ function App() {
         }
         return () => {
             mounted = false;
-            authListener.unsubscribe()
+            authListener?.unsubscribe()
         }
     }, [user])
 

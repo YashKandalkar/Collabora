@@ -29,7 +29,7 @@ const FormSolve = ({supabase, user}) => {
                     return arr;
                 }
             }
-            if (mounted) {
+            if (mounted && user) {
                 const {data, error} = await supabase
                     .from('forms')
                     .select('*')
@@ -45,9 +45,7 @@ const FormSolve = ({supabase, user}) => {
                         .on('UPDATE', payload => {
                             setQuestionsData(state => {
                                 if (state) {
-                                    let newQues = {...state};
-                                    newQues[payload.new.question_number] = payload.new;
-                                    return {...state, ...newQues};
+                                    return {...state, [payload.new.question_number]: payload.new};
                                 } else {
                                     console.error("An error occurred.")
                                 }
@@ -76,13 +74,13 @@ const FormSolve = ({supabase, user}) => {
             }
         }
 
-        getForm(setFormData, setFormError).catch(console.log);
+        getForm(setFormData, setFormError).catch(console.error);
 
         return () => {
             mounted = false;
-            questionsSubscription.unsubscribe();
+            questionsSubscription?.unsubscribe();
         };
-    }, [id, supabase, user.id]);
+    }, [id, supabase, user]);
 
     const onAnswerSet = async (qNum, ans, curr_col_name, last_col_name, last_opt_val) => {
         const {data, error} = await supabase

@@ -22,16 +22,16 @@ const AuthComponent = ({setLogin, supabase, setUser}) => {
 
         const {error, user} = response;
         setLoading(false);
+        if (error) {
+            setPromptText({type: "error", message: error.message});
+            setLogin(false);
+        }
         if (!error && !user) {
             setPromptText({type: "success", message: "An email has been sent to you for verification!"});
             setLogin(false);
         } else if (!error && user) {
             setUser(user);
             setLogin(true);
-        }
-        if (error) {
-            setPromptText({type: "error", message: error.message});
-            setLogin(false);
         }
     };
 
